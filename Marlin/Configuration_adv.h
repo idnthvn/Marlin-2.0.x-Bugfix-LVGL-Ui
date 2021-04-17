@@ -2230,6 +2230,7 @@
  * Requires NOZZLE_PARK_FEATURE.
  * This feature is required for the default FILAMENT_RUNOUT_SCRIPT.
  */
+
 #ifndef TFT_LVGL_UI
 #define ADVANCED_PAUSE_FEATURE
 #endif

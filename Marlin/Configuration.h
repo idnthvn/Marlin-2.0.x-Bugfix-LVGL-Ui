@@ -1709,6 +1709,7 @@
  * Add a bed leveling sub-menu for ABL or MBL.
  * Include a guided procedure if manual probing is enabled.
  */
+
 #ifndef TFT_LVGL_UI
 #define LCD_BED_LEVELING
 #endif
