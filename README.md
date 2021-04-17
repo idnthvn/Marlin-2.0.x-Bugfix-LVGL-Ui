@@ -1,4 +1,4 @@
-# This repository is just a copy of the official Marlin, with Tronxy X5SA (and variants) pre-configured.
+# This repository is a copy of the official Marlin, with Tronxy X5SA (and variants) pre-configured.
 
 
 ## JUST uncomment the option for your machine
