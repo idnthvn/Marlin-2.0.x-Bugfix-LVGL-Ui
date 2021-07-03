@@ -30,11 +30,14 @@
 //#define V6_400_NO_TITAN_TMC 1
 //#define V6_500_TITAN_TMC 1
 
-// #define V5_330_TITAN_TMC 1
-// #define V5_330_TITAN_NO_TMC 1
-// #define V5_330_NO_TITAN_TMC 1
-// #define V5_330_NO_TITAN_NO_TMC 1
+//#define V5_330_TITAN_TMC 1
+//#define V5_330_TITAN_NO_TMC 1
+//#define V5_330_NO_TITAN_TMC 1
+//#define V5_330_NO_TITAN_NO_TMC 1
 //#define XY3_V5_310_NO_TITAN_NO_TMC_NO_ABL 1
+
+// Dual Extruder Upgrade
+//#define 2E
 
 // Section shortened name
 // Tronxy X5SA V6 330 Titan TMC = X5SA V6 330 TTMC 2.0.8
@@ -284,13 +287,20 @@
 
 // This defines the number of extruders
 // :[0, 1, 2, 3, 4, 5, 6, 7, 8]
-#define EXTRUDERS 1
+#if ENABLED(2E)
+  #define EXTRUDERS 2
+#elif
+  #define EXTRUDERS 1
+#endif
+
 
 // Generally expected filament diameter (1.75, 2.85, 3.0, ...). Used for Volumetric, Filament Width Sensor, etc.
 #define DEFAULT_NOMINAL_FILAMENT_DIA 1.75
 
 // For Cyclops or any "multi-extruder" that shares a single nozzle.
-//#define SINGLENOZZLE
+#if ENABLED(2E)
+  #define SINGLENOZZLE
+#endif
 
 // Save and restore temperature and fan speed on tool-change.
 // Set standby for the unselected tool with M104/106/109 T...
@@ -890,6 +900,9 @@
   //#define Z3_DRIVER_TYPE A4988
   //#define Z4_DRIVER_TYPE A4988
   #define E0_DRIVER_TYPE TMC2208_STANDALONE
+  #if ENABLED(2E)
+    #define E1_DRIVER_TYPE TMC2208_STANDALONE
+  #endif
   //#define E1_DRIVER_TYPE A4988
   //#define E2_DRIVER_TYPE A4988
   //#define E3_DRIVER_TYPE A4988
@@ -907,6 +920,9 @@
   //#define Z3_DRIVER_TYPE A4988
   //#define Z4_DRIVER_TYPE A4988
   #define E0_DRIVER_TYPE A4988
+  #if ENABLED(2E)
+    #define E1_DRIVER_TYPE A4988
+  #endif
   //#define E1_DRIVER_TYPE A4988
   //#define E2_DRIVER_TYPE A4988
   //#define E3_DRIVER_TYPE A4988
@@ -955,8 +971,10 @@
  * following movement settings. If fewer factors are given than the
  * total number of extruders, the last value applies to the rest.
  */
+#if ENABLED(2E)
+  #define DISTINCT_E_FACTORS
+#endif
 //#define DISTINCT_E_FACTORS
-
 /**
  * Default Axis Steps Per Unit (steps/mm)
  * Override with M92
@@ -1230,20 +1248,20 @@
  *     |    [-]    |
  *     O-- FRONT --+
  */
-#define NOZZLE_TO_PROBE_OFFSET { -35, 0, 0 }
+#define NOZZLE_TO_PROBE_OFFSET { -31, -5, 0 }
 
 // Most probes should stay away from the edges of the bed, but
 // with NOZZLE_AS_PROBE this can be negative for a wider probing area.
-#define PROBING_MARGIN 50
+#define PROBING_MARGIN 20
 
 // X and Y axis travel speed (mm/min) between probes
-#define XY_PROBE_FEEDRATE (133*60)
+#define XY_PROBE_FEEDRATE (250*60)
 
 // Feedrate (mm/min) for the first approach when double-probing (MULTIPLE_PROBING == 2)
-#define Z_PROBE_FEEDRATE_FAST (4*60)
+#define Z_PROBE_FEEDRATE_FAST (64*60)
 
 // Feedrate (mm/min) for the "accurate" probe of each point
-#define Z_PROBE_FEEDRATE_SLOW (Z_PROBE_FEEDRATE_FAST / 2)
+#define Z_PROBE_FEEDRATE_SLOW (Z_PROBE_FEEDRATE_FAST / 16)
 
 /**
  * Probe Activation Switch
@@ -1386,6 +1404,9 @@
 // For direct drive extruder v9 set to true, for geared extruder set to false.
 #if WITH_TITAN
   #define INVERT_E0_DIR true
+  #if ENABLED(2E)
+    #define INVERT_E1_DIR true
+  #endif
 #else
   #define INVERT_E0_DIR false
 #endif
@@ -1479,8 +1500,11 @@
 #define FILAMENT_RUNOUT_SENSOR
 #if ENABLED(FILAMENT_RUNOUT_SENSOR)
   #define FIL_RUNOUT_ENABLED_DEFAULT true // Enable the sensor on startup. Override with M412 followed by M500.
-  #define NUM_RUNOUT_SENSORS   1          // Number of sensors, up to one per extruder. Define a FIL_RUNOUT#_PIN for each.
-
+  #if ENABLED(2E)
+    #define NUM_RUNOUT_SENSORS   2          // Number of sensors, up to one per extruder. Define a FIL_RUNOUT#_PIN for each.
+  #elseif
+    #define NUM_RUNOUT_SENSORS   1
+  #endif
   #define FIL_RUNOUT_STATE     HIGH       // Pin state indicating that filament is NOT present.
   //#define FIL_RUNOUT_PULLUP             // Use internal pullup for filament runout pins.
   //#define FIL_RUNOUT_PULLDOWN           // Use internal pulldown for filament runout pins.
@@ -1649,9 +1673,13 @@
 #if EITHER(AUTO_BED_LEVELING_LINEAR, AUTO_BED_LEVELING_BILINEAR)
 
   // Set the number of grid points per dimension.
-  #define GRID_MAX_POINTS_X 4
-  #define GRID_MAX_POINTS_Y GRID_MAX_POINTS_X
-
+  // For 400x400 bed should use minimum of 7
+  #ifndef X_BED_SIZE 400
+    #define GRID_MAX_POINTS_X 7
+    #define GRID_MAX_POINTS_Y GRID_MAX_POINTS_X
+  #elseif
+    #define GRID_MAX_POINTS_X 4
+    #define GRID_MAX_POINTS_Y GRID_MAX_POINTS_X
   // Probe along the Y axis, advancing X after each column
   //#define PROBE_Y_FIRST
 
